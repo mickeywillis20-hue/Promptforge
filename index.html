@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Promptforge</title>
+    <link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PromptForge</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+  <div class="noise-overlay"></div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-mark">PF</div>
+      <div class="logo-info">
+        <span class="logo-name">PromptForge</span>
+        <span class="logo-sub">Générateur de Prompts IA</span>
+      </div>
+    </div>
+    <span class="prompt-counter" id="total-counter">0 prompts créés</span>
+  </header>
+
+  <!-- MODE SELECTOR -->
+  <section class="mode-selector">
+    <div class="mode-label">— Que voulez-vous créer ? —</div>
+    <div class="mode-cards">
+
+      <button class="mode-card active" data-mode="image">
+        <div class="mode-card-glow"></div>
+        <div class="mode-card-icon">🎨</div>
+        <div class="mode-card-title">IMAGE</div>
+        <div class="mode-card-desc">Générer une image</div>
+      </button>
+
+      <button class="mode-card" data-mode="modify">
+        <div class="mode-card-glow"></div>
+        <div class="mode-card-icon">✏️</div>
+        <div class="mode-card-title">MODIFIER</div>
+        <div class="mode-card-desc">Retoucher une image</div>
+      </button>
+
+      <button class="mode-card" data-mode="text">
+        <div class="mode-card-glow"></div>
+        <div class="mode-card-icon">📖</div>
+        <div class="mode-card-title">TEXTE</div>
+        <div class="mode-card-desc">Scènes &amp; histoires</div>
+      </button>
+
+      <button class="mode-card" data-mode="video">
+        <div class="mode-card-glow"></div>
+        <div class="mode-card-icon">🎬</div>
+        <div class="mode-card-title">VIDÉO</div>
+        <div class="mode-card-desc">Animation &amp; cinéma</div>
+      </button>
+
+      <button class="mode-card" data-mode="libre">
+        <div class="mode-card-glow"></div>
+        <div class="mode-card-icon">⚡</div>
+        <div class="mode-card-title">LIBRE</div>
+        <div class="mode-card-desc">Prompt personnalisé</div>
+      </button>
+
+    </div>
+  </section>
+
+  <main id="workspace">
+
+    <!-- ======= IMAGE ======= -->
+    <section class="panel active" id="panel-image" data-color="image">
+      <div class="panel-header">
+        <div class="panel-icon-big">🎨</div>
+        <div class="panel-header-text">
+          <h2>Génération d'Image</h2>
+          <p>Décrivez votre vision — le prompt se construit automatiquement</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">👤</span> Sujet principal</label>
+          <input type="text" id="img-sujet" placeholder="ex: une guerrière elfe, un cyborg féminin, un sorcier ancêtre…" class="finput" />
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">⚧</span> Sexe</label>
+          <div class="pill-group" id="grp-img-sexe" data-single="true">
+            <button class="pill" data-val="female">♀ Femme</button>
+            <button class="pill" data-val="male">♂ Homme</button>
+            <button class="pill" data-val="non-binary">⚧ Non-bin.</button>
+            <button class="pill active" data-val="">Indéfini</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">🎂</span> Âge — <span class="slider-val" id="age-display">25 ans</span></label>
+          <input type="range" id="img-age" min="18" max="80" value="25" class="fslider" />
+          <div class="slider-track-labels"><span>18</span><span>80</span></div>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">📐</span> Morphologie</label>
+          <div class="pill-group wrap" id="grp-img-morpho">
+            <button class="pill" data-val="petite and slim">Petite fine</button>
+            <button class="pill" data-val="petite and curvy">Petite ronde</button>
+            <button class="pill" data-val="athletic build">Athlétique</button>
+            <button class="pill" data-val="tall and slender">Grande élancée</button>
+            <button class="pill" data-val="muscular">Musclée</button>
+            <button class="pill" data-val="curvy and voluptuous">Curvy</button>
+            <button class="pill" data-val="imposing massive body">Massive</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">🌍</span> Ethnie / Origine</label>
+          <select class="fselect" id="img-ethnie">
+            <option value="">— Indéfini —</option>
+            <option>Caucasian</option>
+            <option>African American</option>
+            <option>Latina</option>
+            <option>East Asian</option>
+            <option>South Asian</option>
+            <option>Middle Eastern</option>
+            <option>Mixed race</option>
+            <option>Fantasy / Non-human</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">🖌️</span> Style Artistique</label>
+          <div class="style-grid" id="style-grid">
+            <button class="style-btn" data-val="photorealistic">📷 Photo</button>
+            <button class="style-btn" data-val="hyperrealistic">🔍 Hyper-réel</button>
+            <button class="style-btn" data-val="oil painting">🖼️ Peinture</button>
+            <button class="style-btn" data-val="watercolor">💧 Aquarelle</button>
+            <button class="style-btn" data-val="digital illustration">💻 Illustration</button>
+            <button class="style-btn" data-val="comic book style">💥 Comics</button>
+            <button class="style-btn" data-val="manga anime style">⛩️ Manga</button>
+            <button class="style-btn" data-val="epic fantasy art">🐉 Fantasy</button>
+            <button class="style-btn" data-val="dark fantasy art">🌑 Dark Fantasy</button>
+            <button class="style-btn" data-val="cyberpunk neon">🤖 Cyberpunk</button>
+            <button class="style-btn" data-val="steampunk">⚙️ Steampunk</button>
+            <button class="style-btn" data-val="art nouveau">🌸 Art Nouveau</button>
+            <button class="style-btn" data-val="retro vintage">📼 Rétro</button>
+            <button class="style-btn" data-val="3D render">🎲 3D Render</button>
+            <button class="style-btn" data-val="pixel art">🕹️ Pixel Art</button>
+            <button class="style-btn" data-val="concept art">🎯 Concept Art</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">📏</span> Format / Ratio</label>
+          <div class="format-row" id="grp-img-format">
+            <button class="format-btn active" data-val="portrait 2:3 aspect ratio">
+              <div class="fbox" style="width:22px;height:30px"></div>
+              <span>Portrait<br/><small>2:3</small></span>
+            </button>
+            <button class="format-btn" data-val="square 1:1 aspect ratio">
+              <div class="fbox" style="width:26px;height:26px"></div>
+              <span>Carré<br/><small>1:1</small></span>
+            </button>
+            <button class="format-btn" data-val="landscape 16:9 aspect ratio">
+              <div class="fbox" style="width:36px;height:20px"></div>
+              <span>Paysage<br/><small>16:9</small></span>
+            </button>
+            <button class="format-btn" data-val="ultra-wide 21:9 aspect ratio">
+              <div class="fbox" style="width:44px;height:18px"></div>
+              <span>Panorama<br/><small>21:9</small></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">👗</span> Tenue / Vêtements</label>
+          <input type="text" id="img-tenue" placeholder="ex: armure dorée, robe rouge, uniforme militaire…" class="finput" />
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">💇</span> Cheveux</label>
+          <input type="text" id="img-cheveux" placeholder="ex: longs cheveux roux bouclés, coupe courte noire…" class="finput" />
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">😏</span> Expression / Regard</label>
+          <div class="pill-group wrap" id="grp-img-expression">
+            <button class="pill" data-val="intense magnetic gaze">Intense</button>
+            <button class="pill" data-val="sensual smile">Sensuelle</button>
+            <button class="pill" data-val="cold neutral expression">Froide</button>
+            <button class="pill" data-val="powerful confident look">Puissante</button>
+            <button class="pill" data-val="mysterious enigmatic">Mystérieuse</button>
+            <button class="pill" data-val="fierce and angry">Féroce</button>
+            <button class="pill" data-val="melancholic sad">Mélancolique</button>
+            <button class="pill" data-val="direct seductive gaze">Séductrice</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">🧍</span> Pose / Cadrage</label>
+          <div class="pill-group wrap" id="grp-img-pose">
+            <button class="pill" data-val="bust portrait shot">Buste</button>
+            <button class="pill" data-val="close-up face portrait">Visage close</button>
+            <button class="pill" data-val="full body standing">Corps entier</button>
+            <button class="pill" data-val="sitting pose">Assise</button>
+            <button class="pill" data-val="back view">De dos</button>
+            <button class="pill" data-val="dynamic action pose">Action</button>
+            <button class="pill" data-val="lying down pose">Allongée</button>
+            <button class="pill" data-val="overhead plunging shot">Plongeant</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">🏰</span> Décor / Environnement</label>
+          <input type="text" id="img-decor" placeholder="ex: château en ruines, forêt sombre, ville néon la nuit…" class="finput" />
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">💡</span> Éclairage</label>
+          <div class="pill-group wrap" id="grp-img-lumiere">
+            <button class="pill" data-val="soft natural lighting">Naturelle</button>
+            <button class="pill" data-val="dramatic backlighting">Contre-jour</button>
+            <button class="pill" data-val="neon colored lighting">Néon</button>
+            <button class="pill" data-val="chiaroscuro lighting">Clair-obscur</button>
+            <button class="pill" data-val="golden hour warm light">Golden Hour</button>
+            <button class="pill" data-val="moonlight night scene">Lunaire</button>
+            <button class="pill" data-val="magical particle light">Magique</button>
+            <button class="pill" data-val="studio rim lighting">Studio</button>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">✨</span> Qualité &amp; Rendu</label>
+          <div class="pill-group wrap" id="grp-img-qualite">
+            <button class="pill" data-val="ultra detailed">Ultra détaillé</button>
+            <button class="pill" data-val="8K resolution">8K</button>
+            <button class="pill" data-val="photorealistic render">Photoréaliste</button>
+            <button class="pill active" data-val="cinematic lighting">Cinématique</button>
+            <button class="pill active" data-val="sharp focus">Focus précis</button>
+            <button class="pill" data-val="award winning photography">Award-winning</button>
+            <button class="pill active" data-val="masterpiece">Chef-d'œuvre</button>
+            <button class="pill" data-val="trending on artstation">ArtStation</button>
+            <button class="pill" data-val="volumetric lighting">Volumétrique</button>
+            <button class="pill" data-val="ray tracing">Ray Tracing</button>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">🚫</span> Prompt Négatif <span class="flabel-hint">— ce que vous ne voulez PAS</span></label>
+          <input type="text" id="img-negatif" placeholder="ex: ugly, deformed, blurry, watermark, text, extra limbs…" class="finput" />
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">💬</span> Détails supplémentaires libres</label>
+          <textarea id="img-libre" rows="3" class="ftextarea" placeholder="Tout ce que vous voulez ajouter…"></textarea>
+        </div>
+
+      </div>
+
+      <div class="panel-actions">
+        <button class="btn-clear" onclick="resetPanel('image')">🗑 Réinitialiser</button>
+        <button class="btn-gen" onclick="generatePrompt('image')">
+          <span>⚡ Générer le Prompt</span>
+          <div class="btn-shine"></div>
+        </button>
+      </div>
+    </section>
+
+    <!-- ======= MODIFIER ======= -->
+    <section class="panel" id="panel-modify" data-color="modify">
+      <div class="panel-header">
+        <div class="panel-icon-big">✏️</div>
+        <div class="panel-header-text">
+          <h2>Modifier une Image</h2>
+          <p>Transformez, retouchez ou réinterprétez une image existante</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">🖼️</span> Description de l'image originale</label>
+          <textarea id="mod-original" rows="3" class="ftextarea" placeholder="Décrivez l'image de départ : personnage, style, couleurs, composition…"></textarea>
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">🛠️</span> Type de modification</label>
+          <div class="pill-group wrap" id="grp-mod-type">
+            <button class="pill" data-val="change background">🌄 Décor</button>
+            <button class="pill" data-val="change style">🎨 Style</button>
+            <button class="pill" data-val="change clothing">👗 Tenue</button>
+            <button class="pill" data-val="change hair">💇 Cheveux</button>
+            <button class="pill" data-val="change lighting">💡 Lumière</button>
+            <button class="pill" data-val="change expression">😏 Expression</button>
+            <button class="pill" data-val="add element">➕ Ajouter</button>
+            <button class="pill" data-val="remove element">➖ Supprimer</button>
+            <button class="pill" data-val="age progression">⏳ Vieillir</button>
+            <button class="pill" data-val="inpainting">🔲 Inpainting</button>
+            <button class="pill" data-val="img2img transformation">🔄 img2img</button>
+            <button class="pill" data-val="upscale and enhance">🔍 Upscale</button>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">✍️</span> Ce que vous voulez changer</label>
+          <textarea id="mod-changes" rows="3" class="ftextarea" placeholder="Décrivez précisément les modifications souhaitées…"></textarea>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">🎨</span> Nouveau style</label>
+          <select id="mod-style" class="fselect">
+            <option value="">— Aucun changement —</option>
+            <option>Photorealistic</option>
+            <option>Comic book style</option>
+            <option>Manga anime</option>
+            <option>Dark fantasy art</option>
+            <option>Cyberpunk neon</option>
+            <option>Oil painting</option>
+            <option>Watercolor</option>
+            <option>3D render</option>
+            <option>Pixel art</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">💪</span> Intensité</label>
+          <div class="pill-group" id="grp-mod-force" data-single="true">
+            <button class="pill active" data-val="subtle modification strength 0.3">Légère</button>
+            <button class="pill" data-val="moderate modification strength 0.5">Modérée</button>
+            <button class="pill" data-val="strong modification strength 0.7">Forte</button>
+            <button class="pill" data-val="total transformation strength 0.9">Totale</button>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">🔒</span> Éléments à CONSERVER</label>
+          <input type="text" id="mod-conserver" placeholder="ex: visage, composition générale, palette de couleurs…" class="finput" />
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">💬</span> Notes supplémentaires</label>
+          <textarea id="mod-libre" rows="2" class="ftextarea" placeholder="Précisions supplémentaires…"></textarea>
+        </div>
+      </div>
+
+      <div class="panel-actions">
+        <button class="btn-clear" onclick="resetPanel('modify')">🗑 Réinitialiser</button>
+        <button class="btn-gen" onclick="generatePrompt('modify')">
+          <span>⚡ Générer le Prompt</span>
+          <div class="btn-shine"></div>
+        </button>
+      </div>
+    </section>
+
+    <!-- ======= TEXTE ======= -->
+    <section class="panel" id="panel-text" data-color="text">
+      <div class="panel-header">
+        <div class="panel-icon-big">📖</div>
+        <div class="panel-header-text">
+          <h2>Texte / Scène / Histoire</h2>
+          <p>Récits, dialogues, descriptions, univers entiers — sans limites</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">📄</span> Type de contenu</label>
+          <div class="pill-group wrap" id="grp-txt-type">
+            <button class="pill" data-val="short story">Nouvelle</button>
+            <button class="pill" data-val="scene description">Scène</button>
+            <button class="pill" data-val="dialogue">Dialogue</button>
+            <button class="pill" data-val="character description">Personnage</button>
+            <button class="pill" data-val="world building lore">World-building</button>
+            <button class="pill" data-val="poem">Poème</button>
+            <button class="pill" data-val="screenplay script">Scénario</button>
+            <button class="pill" data-val="explicit erotic scene">Érotique</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">📚</span> Genre</label>
+          <select id="txt-genre" class="fselect">
+            <option value="">— Indéfini —</option>
+            <option>Epic Fantasy</option>
+            <option>Dark Fantasy</option>
+            <option>Science-Fiction</option>
+            <option>Cyberpunk</option>
+            <option>Horror</option>
+            <option>Romance</option>
+            <option>Explicit Erotic</option>
+            <option>Thriller</option>
+            <option>Adventure</option>
+            <option>Historical</option>
+            <option>Mythology</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">🌡️</span> Ton / Atmosphère</label>
+          <select id="txt-ton" class="fselect">
+            <option value="">— Indéfini —</option>
+            <option>Dark and intense</option>
+            <option>Sensual and intoxicating</option>
+            <option>Epic and grandiose</option>
+            <option>Mysterious and cryptic</option>
+            <option>Violent and brutal</option>
+            <option>Romantic and poetic</option>
+            <option>Humorous and light</option>
+            <option>Cold and clinical</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">🧑‍🤝‍🧑</span> Personnages</label>
+          <textarea id="txt-persos" rows="2" class="ftextarea" placeholder="Décrivez les personnages : nom, apparence, rôle, relation entre eux…"></textarea>
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">💡</span> Idée / Intrigue principale</label>
+          <textarea id="txt-idee" rows="3" class="ftextarea" placeholder="De quoi parle la scène ? Quel est l'enjeu ? Que se passe-t-il ?"></textarea>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">📏</span> Longueur</label>
+          <div class="pill-group wrap" id="grp-txt-longueur" data-single="true">
+            <button class="pill" data-val="very short around 100 words">Micro</button>
+            <button class="pill active" data-val="short around 300 words">Courte</button>
+            <button class="pill" data-val="medium around 600 words">Moyenne</button>
+            <button class="pill" data-val="long over 1000 words">Longue</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">🌐</span> Langue de sortie</label>
+          <select id="txt-langue" class="fselect">
+            <option>Français</option>
+            <option>English</option>
+            <option>Español</option>
+            <option>Deutsch</option>
+            <option>日本語</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">💬</span> Instructions spécifiques</label>
+          <textarea id="txt-libre" rows="3" class="ftextarea" placeholder="Détails supplémentaires, contraintes, ambiance précise…"></textarea>
+        </div>
+
+      </div>
+
+      <div class="panel-actions">
+        <button class="btn-clear" onclick="resetPanel('text')">🗑 Réinitialiser</button>
+        <button class="btn-gen" onclick="generatePrompt('text')">
+          <span>⚡ Générer le Prompt</span>
+          <div class="btn-shine"></div>
+        </button>
+      </div>
+    </section>
+
+    <!-- ======= VIDÉO ======= -->
+    <section class="panel" id="panel-video" data-color="video">
+      <div class="panel-header">
+        <div class="panel-icon-big">🎬</div>
+        <div class="panel-header-text">
+          <h2>Génération Vidéo</h2>
+          <p>Sora, Runway, Kling, Luma — décrivez votre séquence</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">🎯</span> Outil cible</label>
+          <div class="pill-group wrap" id="grp-vid-outil">
+            <button class="pill" data-val="Sora">Sora</button>
+            <button class="pill" data-val="Runway Gen-3">Runway</button>
+            <button class="pill" data-val="Kling">Kling</button>
+            <button class="pill" data-val="Pika">Pika</button>
+            <button class="pill" data-val="Luma Dream Machine">Luma</button>
+            <button class="pill" data-val="Hailuo">Hailuo</button>
+            <button class="pill" data-val="Wan Video">Wan</button>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">🎬</span> Scène / Sujet principal</label>
+          <textarea id="vid-sujet" rows="3" class="ftextarea" placeholder="Décrivez ce que la vidéo doit montrer, l'action, les personnages…"></textarea>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">🎨</span> Style Vidéo</label>
+          <select id="vid-style" class="fselect">
+            <option value="">— Indéfini —</option>
+            <option>Cinematic realistic</option>
+            <option>3D animation</option>
+            <option>Anime style</option>
+            <option>Stop motion</option>
+            <option>Timelapse</option>
+            <option>Slow motion</option>
+            <option>Documentary</option>
+            <option>Music video</option>
+            <option>Short film</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">🎥</span> Mouvement de caméra</label>
+          <div class="pill-group wrap" id="grp-vid-camera">
+            <button class="pill" data-val="static shot">Fixe</button>
+            <button class="pill" data-val="slow zoom in">Zoom</button>
+            <button class="pill" data-val="lateral tracking shot">Traveling</button>
+            <button class="pill" data-val="orbital rotation">Orbital</button>
+            <button class="pill" data-val="aerial drone shot">Drone</button>
+            <button class="pill" data-val="handheld camera">Épaule</button>
+            <button class="pill" data-val="horizontal pan">Pan</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">⏱️</span> Durée</label>
+          <div class="pill-group wrap" id="grp-vid-duree" data-single="true">
+            <button class="pill active" data-val="2-4 seconds">2-4s</button>
+            <button class="pill" data-val="5-10 seconds">5-10s</button>
+            <button class="pill" data-val="15-30 seconds">15-30s</button>
+            <button class="pill" data-val="1 minute">1 min</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">🎵</span> Ambiance sonore</label>
+          <input type="text" id="vid-son" placeholder="ex: orchestre épique, électronique sombre, silence…" class="finput" />
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">💬</span> Détails supplémentaires</label>
+          <textarea id="vid-libre" rows="2" class="ftextarea" placeholder="Éclairage, couleurs, transitions, effets spéciaux…"></textarea>
+        </div>
+      </div>
+
+      <div class="panel-actions">
+        <button class="btn-clear" onclick="resetPanel('video')">🗑 Réinitialiser</button>
+        <button class="btn-gen" onclick="generatePrompt('video')">
+          <span>⚡ Générer le Prompt</span>
+          <div class="btn-shine"></div>
+        </button>
+      </div>
+    </section>
+
+    <!-- ======= LIBRE ======= -->
+    <section class="panel" id="panel-libre" data-color="libre">
+      <div class="panel-header">
+        <div class="panel-icon-big">⚡</div>
+        <div class="panel-header-text">
+          <h2>Prompt Libre</h2>
+          <p>Construisez un prompt sur mesure pour n'importe quel outil IA</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">🎯</span> Outil / Modèle cible</label>
+          <div class="pill-group wrap" id="grp-lib-outil">
+            <button class="pill" data-val="Midjourney">Midjourney</button>
+            <button class="pill" data-val="DALL-E 3">DALL-E 3</button>
+            <button class="pill" data-val="Stable Diffusion">Stable Diffusion</button>
+            <button class="pill" data-val="Flux">Flux</button>
+            <button class="pill" data-val="Claude">Claude</button>
+            <button class="pill" data-val="ChatGPT">ChatGPT</button>
+            <button class="pill" data-val="Gemini">Gemini</button>
+            <button class="pill" data-val="Leonardo AI">Leonardo</button>
+            <button class="pill" data-val="Adobe Firefly">Firefly</button>
+            <button class="pill" data-val="Ideogram">Ideogram</button>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">🎯</span> Objectif principal</label>
+          <input type="text" id="lib-objectif" placeholder="Que voulez-vous accomplir avec ce prompt ?" class="finput" />
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">📝</span> Contexte &amp; Contenu</label>
+          <textarea id="lib-contexte" rows="5" class="ftextarea" placeholder="Décrivez librement tout ce que vous voulez. Aucune limite…"></textarea>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">📐</span> Format du prompt</label>
+          <div class="pill-group wrap" id="grp-lib-format" data-single="true">
+            <button class="pill active" data-val="concise">Concis</button>
+            <button class="pill" data-val="detailed">Détaillé</button>
+            <button class="pill" data-val="ultra-detailed">Ultra-détaillé</button>
+            <button class="pill" data-val="structured with sections">Structuré</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="flabel"><span class="flabel-icon">🌐</span> Langue</label>
+          <select id="lib-langue" class="fselect">
+            <option>English (recommandé)</option>
+            <option>Français</option>
+            <option>Bilingue FR/EN</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label class="flabel"><span class="flabel-icon">🏷️</span> Mots-clés additionnels</label>
+          <input type="text" id="lib-keywords" placeholder="ex: introspective, award winning, trending, vivid colors…" class="finput" />
+        </div>
+      </div>
+
+      <div class="panel-actions">
+        <button class="btn-clear" onclick="resetPanel('libre')">🗑 Réinitialiser</button>
+        <button class="btn-gen" onclick="generatePrompt('libre')">
+          <span>⚡ Générer le Prompt</span>
+          <div class="btn-shine"></div>
+        </button>
+      </div>
+    </section>
+
+    <!-- ======= RÉSULTAT ======= -->
+    <div id="result-box" class="result-box hidden">
+      <div class="result-top">
+        <div class="result-label">
+          <span class="result-dot"></span>
+          Prompt généré
+        </div>
+        <div class="result-btns">
+          <button class="rbtn" onclick="copyPrompt()">📋 Copier</button>
+          <button class="rbtn" onclick="savePromptFile()">💾 .txt</button>
+          <button class="rbtn close-rbtn" onclick="closeResult()">✕</button>
+        </div>
+      </div>
+      <div id="prompt-output" class="prompt-output"></div>
+      <div id="neg-box" class="neg-box hidden">
+        <span class="neg-label">NÉGATIF →</span>
+        <span id="neg-output"></span>
+      </div>
+    </div>
+
+    <!-- ======= HISTORIQUE ======= -->
+    <div class="history-section">
+      <div class="history-top">
+        <h3>📚 Historique <span id="hcount">(0)</span></h3>
+        <button class="rbtn close-rbtn" onclick="clearHistory()">Tout effacer</button>
+      </div>
+      <div id="history-list" class="history-list">
+        <p class="empty-hist">Aucun prompt pour l'instant — commencez à en créer !</p>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
+    <script  src="./script.js"></script>
+
+  </body>
+  
+</html>
